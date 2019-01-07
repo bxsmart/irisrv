@@ -1,0 +1,11 @@
+package: byex.io/httpsrv
+import:
+- package: github.com/betacraft/yaag
+  subpackages:
+  - yaag
+- package: github.com/kataras/iris
+  version: ~11.1.0
+  subpackages:
+  - context
+  - middleware/logger
+  - middleware/recover
