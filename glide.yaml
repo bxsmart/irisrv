@@ -1,11 +1,55 @@
-package: byex.io/httpsrv
+package: .
 import:
+- package: byex.io/httpsrv/basic
+- package: byex.io/httpsrv/dao
+- package: byex.io/httpsrv/mvc
+  subpackages:
+  - controller
+  - entity
+- package: byex.io/httpsrv/node
+- package: byex.io/httpsrv/public
+  subpackages:
+  - libdao
+- package: byex.io/httpsrv/utils
 - package: github.com/betacraft/yaag
   subpackages:
+  - irisyaag
   - yaag
+- package: github.com/bxsmart/bxcore
+  subpackages:
+  - cache
+  - cache/redis
+  - log
+- package: github.com/dgrijalva/jwt-go
+  version: ~3.2.0
+- package: github.com/go-xorm/core
+  version: ~0.6.0
+- package: github.com/go-xorm/xorm
+  version: ~0.7.1
+- package: github.com/iris-contrib/middleware
+  version: ~10.0.0
+  subpackages:
+  - jwt
+- package: github.com/jinzhu/gorm
+  version: ~1.9.2
+  subpackages:
+  - dialects/mysql
 - package: github.com/kataras/iris
   version: ~11.1.0
   subpackages:
   - context
   - middleware/logger
   - middleware/recover
+  - sessions
+- package: github.com/naoina/toml
+  version: ~0.1.1
+- package: github.com/natefinch/lumberjack
+  version: ~2.1.0
+- package: github.com/shopspring/decimal
+  version: ~1.1.0
+- package: go.uber.org/zap
+  version: ~1.9.1
+  subpackages:
+  - zapcore
+- package: gopkg.in/urfave/cli.v1
+  version: ~1.20.0
