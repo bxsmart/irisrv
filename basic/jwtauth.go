@@ -26,7 +26,7 @@ func JWTTokenExtractor(ctx iris.Context) (string, error) {
 	return jwtmw.FromAuthHeader(ctx)
 }
 
-func JWTAuth(app *iris.Application, option JwtOptions) {
+func JWTAuth(option JwtOptions) iris.Handler {
 	jwtHandler := jwtmw.New(jwtmw.Config{
 		ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
 			return []byte(option.Secret), nil
@@ -38,11 +38,11 @@ func JWTAuth(app *iris.Application, option JwtOptions) {
 		ErrorHandler:        UnauthorizedError,
 		CredentialsOptional: false,
 		Extractor:           JWTTokenExtractor,
-		Debug:               false,
+		Debug:               true,
 		EnableAuthOnOptions: false,
 		SigningMethod:       jwt.SigningMethodHS256,
 		Expiration:          false,
 	})
 
-	app.Use(jwtHandler.Serve)
+	return jwtHandler.Serve
 }

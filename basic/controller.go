@@ -8,20 +8,22 @@ import (
 )
 
 type Controller interface {
+	Init(jwt iris.Handler) Controller
+	Version(ver string) Controller
 	Router(app *iris.Application)
-	Init()
-	Version(ver string)
 }
 
 type basicController struct {
 	App *iris.Application
+	Jwt iris.Handler
+	Ver string
 
 	CtrlKv map[string]interface{}
 }
 
 var basicCtrl basicController
 
-func InitBasicCtrl(app *iris.Application) {
+func InitBasicCtrl(app *iris.Application, jwt iris.Handler, ver string) {
 	app.Use(customerLogger())
 	app.Use(Before)
 	app.Done(After)
@@ -29,19 +31,12 @@ func InitBasicCtrl(app *iris.Application) {
 	app.OnErrorCode(iris.StatusNotFound, notFound)
 	app.OnErrorCode(iris.StatusInternalServerError, internalServerError)
 
-	basicCtrl = basicController{App: app, CtrlKv: make(map[string]interface{})}
-}
-
-func RegisterCtrl(ctrl Controller) {
-	rtype := reflect.TypeOf(ctrl)
-
-	println(rtype.Name())
-
-	ctrl.Version("/v1")
-	ctrl.Router(basicCtrl.App)
-
-	println("#### register ctrl: ", rtype.String())
-	basicCtrl.CtrlKv[rtype.String()] = ctrl
+	basicCtrl = basicController{
+		App:    app,
+		Jwt:    jwt,
+		Ver:    ver,
+		CtrlKv: make(map[string]interface{}),
+	}
 }
 
 func notFound(ctx iris.Context) {
@@ -65,14 +60,30 @@ func internalServerError(ctx iris.Context) {
 type BasicController struct {
 	Controller
 	Ver string
+	Jwt iris.Handler
 }
 
-func (c *BasicController) Version(ver string) {
+func RegisterCtrl(c Controller) Controller {
+	rtype := reflect.TypeOf(c)
+	println("#### register: ", rtype.String())
+
+	c.Version(basicCtrl.Ver)
+	c.Init(basicCtrl.Jwt)
+	c.Router(basicCtrl.App)
+
+	basicCtrl.CtrlKv[rtype.String()] = c
+
+	return c
+}
+
+func (c *BasicController) Version(ver string) Controller {
 	c.Ver = ver
+	return c
 }
 
-func (c *BasicController) Init() {
-	RegisterCtrl(c)
+func (c *BasicController) Init(jwt iris.Handler) Controller {
+	c.Jwt = jwt
+	return c
 }
 
 func (c *BasicController) GetValue(ctx iris.Context, key string) string {

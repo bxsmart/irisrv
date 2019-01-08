@@ -33,19 +33,14 @@ func (option *SrvOptions) ListenAddr() (addr string) {
 }
 
 type IrisSrv struct {
-	options SrvOptions
-	jwt     basic.JwtOptions
-	app     *iris.Application
+	options    SrvOptions
+	jwtOptions basic.JwtOptions
+	jwt        iris.Handler
+	app        *iris.Application
 }
 
 func NewHttpSrv(jwtOption basic.JwtOptions, option SrvOptions) *IrisSrv {
-	httpSrv := &IrisSrv{
-		options: option,
-		jwt:     jwtOption,
-	}
-
 	app := iris.New()
-	httpSrv.app = app
 	app.Use(recover.New())
 	app.RegisterView(iris.HTML("./views", ".html"))
 
@@ -57,11 +52,12 @@ func NewHttpSrv(jwtOption basic.JwtOptions, option SrvOptions) *IrisSrv {
 		app.Shutdown(ctx)
 	})
 
-	public.InitYaag(app)
-	basic.JWTAuth(app, httpSrv.jwt)
-	basic.InitBasicCtrl(app)
-	Initialize()
-
+	httpSrv := &IrisSrv{
+		options:    option,
+		jwtOptions: jwtOption,
+		jwt:        basic.JWTAuth(jwtOption),
+		app:        app,
+	}
 	return httpSrv
 }
 
@@ -69,8 +65,11 @@ func (s *IrisSrv) Start() {
 	go s.app.Run(iris.Addr(s.options.ListenAddr()), iris.WithoutInterruptHandler)
 }
 
-func Initialize() {
-	basic.RegisterCtrl(&controller.CCoinController{})
-	basic.RegisterCtrl(&controller.FCoinController{})
-	basic.RegisterCtrl(&controller.DemoController{})
+func (s *IrisSrv) BeforeStart() {
+	public.InitYaag(s.app)
+	basic.InitBasicCtrl(s.app, s.jwt, "/v1")
+
+	basic.RegisterCtrl(new(controller.CCoinController))
+	basic.RegisterCtrl(new(controller.FCoinController))
+	basic.RegisterCtrl(new(controller.DemoController))
 }

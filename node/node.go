@@ -31,6 +31,7 @@ func NewNode(logger *zap.Logger, globalConfig *GlobalConfig) *Node {
 }
 
 func (n *Node) BeforeStart() {
+	n.irisSrv.BeforeStart()
 }
 
 func (n *Node) Start() {

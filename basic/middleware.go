@@ -1,6 +1,7 @@
 package basic
 
 import (
+	"byex.io/irisrv/public/log"
 	"byex.io/irisrv/utils"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/middleware/logger"
@@ -42,7 +43,7 @@ func customerLogger() iris.Handler {
 
 		LogFunc: func(now time.Time, latency time.Duration, status, ip, method, path string, message interface{}, headerMessage interface{}) {
 			output := logger.Columnize(now.Format("2006/01/02 - 15:04:05"), latency, status, ip, method, path, message, headerMessage)
-			println(output)
+			log.Println(output)
 		},
 	}
 
