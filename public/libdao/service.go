@@ -1,12 +1,9 @@
 package libdao
 
 import (
-	"github.com/bxsmart/bxcore/log"
-	xormcore "github.com/go-xorm/core"
-	"github.com/go-xorm/xorm"
+	"byex.io/irisrv/public/log"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"os"
 	"time"
 )
 
@@ -17,7 +14,7 @@ const (
 type RdsServiceImpl struct {
 	options *RdSqlOptions
 	tables  []interface{}
-	Db      *xorm.Engine
+	Db      *gorm.DB
 }
 
 type RdSqlOptions struct {
@@ -33,8 +30,12 @@ type RdSqlOptions struct {
 	Debug              bool
 }
 
-type XormLogger struct {
-	xormcore.ILogger
+type OrmLogger struct {
+	gorm.Logger
+}
+
+func (logger *OrmLogger) Println(values ...interface{}) {
+	log.Println(gorm.LogFormatter(values...)...)
 }
 
 func NewRdsService(options *RdSqlOptions) RdsServiceImpl {
@@ -46,8 +47,12 @@ func NewRdsService(options *RdSqlOptions) RdsServiceImpl {
 		return options.TablePrefix + defaultTableName
 	}
 
-	url := options.User + ":" + options.Password + "@tcp(" + options.Address + ")/" + options.DbName + "?charset=utf8&parseTime=True"
-	db, err := xorm.NewEngine(DefaultRdsDriver, url)
+	if len(options.Driver) <= 0 {
+		options.Driver = DefaultRdsDriver
+	}
+
+	url := options.User + ":" + options.Password + "@tcp(" + options.Address + ")/" + options.DbName + "?charset=utf8mb4&parseTime=True"
+	db, err := gorm.Open(options.Driver, url)
 	if err != nil {
 		log.Fatalf("mysql connection error:%s", err.Error())
 	}
@@ -56,8 +61,9 @@ func NewRdsService(options *RdSqlOptions) RdsServiceImpl {
 	db.DB().SetMaxIdleConns(options.MaxIdleConnections)
 	db.DB().SetMaxOpenConns(options.MaxOpenConnections)
 
-	db.SetLogger(xorm.NewSimpleLogger(os.Stdout))
-	db.Logger().SetLevel(xormcore.LOG_INFO)
+	db.SetLogger(&OrmLogger{})
+
+	db.LogMode(options.Debug)
 
 	impl.Db = db
 

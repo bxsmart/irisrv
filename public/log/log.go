@@ -83,3 +83,7 @@ func Panicw(msg string, keysAndValues ...interface{}) {
 func Fatalw(msg string, keysAndValues ...interface{}) {
 	sugaredLogger.Fatalw(msg, keysAndValues...)
 }
+
+func Println(args ...interface{}) {
+	sugaredLogger.Info(args)
+}

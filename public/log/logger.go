@@ -50,6 +50,10 @@ func Initialize(config ...zap.Config) *zap.Logger {
 	return logger
 }
 
+func GetLogger() *zap.Logger {
+	return logger
+}
+
 func IsInit() bool {
 	return nil != logger
 }

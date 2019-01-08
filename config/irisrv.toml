@@ -22,7 +22,7 @@ title = "order_srv"
 
 [mysql]
     db_name = "byex_db_dev"
-    address = "192.168.10.116:3306"
+    address = "192.168.1.116:3306"
     user = "develop"
     password = "byextest456"
     table_prefix = ""
@@ -38,3 +38,6 @@ title = "order_srv"
     idle_timeout = 20
     max_idle = 2
     max_active = 5
+
+[http_srv]
+    port = "8000"

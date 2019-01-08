@@ -1,18 +1,11 @@
 package node
 
 import (
-	"byex.io/httpsrv/basic"
-	"byex.io/httpsrv/dao"
-	"byex.io/httpsrv/mvc"
-	"byex.io/httpsrv/public"
-	"context"
-	"fmt"
+	"byex.io/irisrv/dao"
+	"byex.io/irisrv/http"
 	"github.com/bxsmart/bxcore/cache"
-	"github.com/kataras/iris"
-	"github.com/kataras/iris/middleware/recover"
 	"go.uber.org/zap"
 	"sync"
-	"time"
 )
 
 type Node struct {
@@ -20,7 +13,7 @@ type Node struct {
 	rdsSrv       *dao.RdsService
 	wg           *sync.WaitGroup
 	logger       *zap.Logger
-	irisSrv      *iris.Application
+	irisSrv      *http.IrisSrv
 }
 
 func NewNode(logger *zap.Logger, globalConfig *GlobalConfig) *Node {
@@ -32,6 +25,7 @@ func NewNode(logger *zap.Logger, globalConfig *GlobalConfig) *Node {
 	// register
 	n.registerMysql()
 	n.registerCache()
+	n.registerIrisSrv()
 
 	return n
 }
@@ -40,9 +34,9 @@ func (n *Node) BeforeStart() {
 }
 
 func (n *Node) Start() {
+	n.irisSrv.Start()
 
-	// 启动Rpc监听端口
-	fmt.Println("step in ordsrv node start")
+	println("step in irisrv node start...")
 }
 
 func (n *Node) AfterStart() {
@@ -73,23 +67,5 @@ func (n *Node) registerCache() {
 }
 
 func (n *Node) registerIrisSrv() {
-	app := iris.New()
-	n.irisSrv = app
-	app.Use(recover.New())
-	app.RegisterView(iris.HTML("./views", ".html"))
-
-	iris.RegisterOnInterrupt(func() {
-		timeout := 5 * time.Second
-		ctx, cancel := context.WithTimeout(context.Background(), timeout)
-		defer cancel()
-		// close all hosts
-		app.Shutdown(ctx)
-	})
-
-	public.InitYaag(app)
-	basic.JWTAuth(app, n.globalConfig.Jwt)
-	basic.InitBasicCtrl(app)
-	mvc.Initialize()
-
-	app.Run(iris.Addr(":8000"), iris.WithoutInterruptHandler)
+	n.irisSrv = http.NewHttpSrv(n.globalConfig.Jwt, n.globalConfig.HttpSrv)
 }

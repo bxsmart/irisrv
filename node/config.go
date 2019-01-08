@@ -1,8 +1,9 @@
 package node
 
 import (
-	"byex.io/httpsrv/basic"
-	"byex.io/httpsrv/public/libdao"
+	"byex.io/irisrv/basic"
+	"byex.io/irisrv/http"
+	"byex.io/irisrv/public/libdao"
 	"errors"
 	"github.com/bxsmart/bxcore/cache/redis"
 	"github.com/naoina/toml"
@@ -14,7 +15,7 @@ import (
 func LoadConfig(file string) *GlobalConfig {
 	if "" == file {
 		dir, _ := os.Getwd()
-		file = dir + "/config/httpsrv.toml"
+		file = dir + "/config/irisrv.toml"
 	}
 
 	io, err := os.Open(file)
@@ -31,11 +32,12 @@ func LoadConfig(file string) *GlobalConfig {
 }
 
 type GlobalConfig struct {
-	Title string `required:"true"`
-	Log   zap.Config
-	Jwt   basic.JwtOptions
-	Mysql libdao.RdSqlOptions
-	Redis redis.RedisOptions
+	Title   string `required:"true"`
+	Log     zap.Config
+	Jwt     basic.JwtOptions
+	HttpSrv http.SrvOptions
+	Mysql   libdao.RdSqlOptions
+	Redis   redis.RedisOptions
 }
 
 func Validator(cv reflect.Value) (bool, error) {

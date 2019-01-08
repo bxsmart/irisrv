@@ -1,8 +1,8 @@
 package dao
 
 import (
-	"byex.io/httpsrv/public/libdao"
-	"github.com/bxsmart/bxcore/log"
+	"byex.io/irisrv/public/libdao"
+	"byex.io/irisrv/public/log"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 

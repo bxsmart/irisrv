@@ -2,7 +2,6 @@ package libdao
 
 import (
 	"fmt"
-	orm "github.com/go-xorm/xorm"
 	"github.com/jinzhu/gorm"
 )
 
@@ -10,7 +9,7 @@ type Table interface {
 	TableName() string
 }
 
-type LibRdsService interface {
+type RdsService interface {
 	// create tables
 	SetTables(tables []interface{})
 	CreateTables() error
@@ -23,11 +22,11 @@ type LibRdsService interface {
 	Last(item interface{}) error
 	Save(item interface{}) error
 	FindAll(item interface{}) error
-	FindForUpdate(item interface{}, tx *orm.Engine) error
+	FindForUpdate(item interface{}, tx *gorm.DB) error
 }
 
 // find for update
-func (s *RdsServiceImpl) ForUpdate(tx *orm.Engine) *gorm.DB {
+func (s *RdsServiceImpl) ForUpdate(tx *gorm.DB) *gorm.DB {
 	return tx.Set("gorm:query_option", " FOR UPDATE ")
 }
 
@@ -73,7 +72,6 @@ func (s *RdsServiceImpl) SetTables(tables []interface{}) {
 
 func (s *RdsServiceImpl) CreateTables() error {
 	for _, t := range s.tables {
-		s.engine.CreateTables()
 		if ok := s.Db.HasTable(t); !ok {
 			if err := s.Db.CreateTable(t).Error; err != nil {
 				return fmt.Errorf("create mysql table error:%s", err.Error())

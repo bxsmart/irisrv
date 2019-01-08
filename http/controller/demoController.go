@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"byex.io/httpsrv/basic"
+	"byex.io/irisrv/basic"
 	"github.com/kataras/iris"
 )
 

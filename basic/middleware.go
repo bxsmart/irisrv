@@ -1,7 +1,7 @@
 package basic
 
 import (
-	"byex.io/httpsrv/utils"
+	"byex.io/irisrv/utils"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/middleware/logger"
 	"time"
