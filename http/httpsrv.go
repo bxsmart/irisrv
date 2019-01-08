@@ -18,6 +18,7 @@ const (
 type SrvOptions struct {
 	Address string
 	Port    string
+	Debug   bool
 }
 
 func (option *SrvOptions) ListenAddr() (addr string) {
@@ -66,7 +67,10 @@ func (s *IrisSrv) Start() {
 }
 
 func (s *IrisSrv) BeforeStart() {
-	public.InitYaag(s.app)
+	if s.options.Debug {
+		public.InitYaag(s.app)
+	}
+
 	basic.InitBasicCtrl(s.app, s.jwt, "/v1")
 
 	basic.RegisterCtrl(new(controller.CCoinController))

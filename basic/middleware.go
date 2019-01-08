@@ -11,12 +11,12 @@ import (
 func Before(ctx iris.Context) {
 	remoteAddr := utils.GetRemoteAddr(ctx)
 	ctx.Values().Set("RemoteAddr", remoteAddr)
-	println("before ########### 00000")
+	log.Println("before ########### 00000")
 	ctx.Next()
 }
 
 func After(ctx iris.Context) {
-	println("after  ########### 11111")
+	log.Println("after  ########### 11111")
 }
 
 func customerLogger() iris.Handler {
@@ -42,8 +42,7 @@ func customerLogger() iris.Handler {
 		MessageHeaderKeys: []string{"User-Agent"},
 
 		LogFunc: func(now time.Time, latency time.Duration, status, ip, method, path string, message interface{}, headerMessage interface{}) {
-			output := logger.Columnize(now.Format("2006/01/02 - 15:04:05"), latency, status, ip, method, path, message, headerMessage)
-			log.Println(output)
+			log.Println(now.Format("2019/01/01 00:00:00"), latency, status, ip, method, path, message, headerMessage)
 		},
 	}
 

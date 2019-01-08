@@ -59,12 +59,12 @@ func (n *Node) Stop() {
 func (n *Node) AfterStop() {
 }
 
-func (n *Node) registerMysql() {
-	n.rdsSrv = dao.NewDb(&n.globalConfig.Mysql)
-}
-
 func (n *Node) registerCache() {
 	cache.NewCache(n.globalConfig.Redis)
+}
+
+func (n *Node) registerMysql() {
+	n.rdsSrv = dao.NewDb(&n.globalConfig.Mysql)
 }
 
 func (n *Node) registerIrisSrv() {

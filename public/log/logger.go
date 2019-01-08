@@ -23,12 +23,20 @@ func Initialize(config ...zap.Config) *zap.Logger {
 	} else {
 		cfg = config[0]
 
-		hook := lumberjack.Logger{
-			Filename:   "./logs/httpsrv.log", // 日志文件路径
-			MaxSize:    1024,                 // megabytes
-			MaxBackups: 7,                    // 最多保留3个备份
-			MaxAge:     30,                   //days
-			Compress:   true,                 // 是否压缩 disabled by default
+		sink := lumberjack.Logger{
+			Filename:   cfg.OutputPaths[0], // 日志文件路径
+			MaxSize:    1024,               // megabytes
+			MaxBackups: 7,                  // 最多保留3个备份
+			MaxAge:     30,                 //days
+			Compress:   true,               // 是否压缩 disabled by default
+		}
+
+		errSink := lumberjack.Logger{
+			Filename:   cfg.ErrorOutputPaths[0], // 日志文件路径
+			MaxSize:    1024,                    // megabytes
+			MaxBackups: 1,                       // 最多保留3个备份
+			MaxAge:     30,                      //days
+			Compress:   true,                    // 是否压缩 disabled by default
 		}
 
 		cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
@@ -37,11 +45,11 @@ func Initialize(config ...zap.Config) *zap.Logger {
 
 		core := zapcore.NewCore(
 			zapcore.NewConsoleEncoder(cfg.EncoderConfig),
-			zapcore.AddSync(&hook),
+			zapcore.AddSync(&sink),
 			cfg.Level,
 		)
 
-		logger = zap.New(core)
+		logger = zap.New(core, zap.ErrorOutput(zapcore.AddSync(&errSink)))
 	}
 
 	sugaredLogger = logger.Sugar()

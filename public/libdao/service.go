@@ -30,11 +30,11 @@ type RdSqlOptions struct {
 	Debug              bool
 }
 
-type OrmLogger struct {
+type LogWriter struct {
 	gorm.Logger
 }
 
-func (logger *OrmLogger) Println(values ...interface{}) {
+func (writer *LogWriter) Println(values ...interface{}) {
 	log.Println(gorm.LogFormatter(values...)...)
 }
 
@@ -61,7 +61,7 @@ func NewRdsService(options *RdSqlOptions) RdsServiceImpl {
 	db.DB().SetMaxIdleConns(options.MaxIdleConnections)
 	db.DB().SetMaxOpenConns(options.MaxOpenConnections)
 
-	db.SetLogger(&OrmLogger{})
+	db.SetLogger(&gorm.Logger{LogWriter: &LogWriter{}})
 
 	db.LogMode(options.Debug)
 

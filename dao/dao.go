@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"byex.io/irisrv/http/entity"
 	"byex.io/irisrv/public/libdao"
 	"byex.io/irisrv/public/log"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -23,6 +24,8 @@ func NewDb(options *libdao.RdSqlOptions) *RdsService {
 	s.RdsServiceImpl = libdao.NewRdsService(options)
 
 	var tables []interface{}
+
+	tables = append(tables, &entity.CCoin{})
 
 	// TODO 若数据库表已经创建则不用每次都校验
 	s.SetTables(tables)

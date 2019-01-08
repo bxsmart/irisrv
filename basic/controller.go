@@ -65,7 +65,7 @@ type BasicController struct {
 
 func RegisterCtrl(c Controller) Controller {
 	rtype := reflect.TypeOf(c)
-	println("#### register: ", rtype.String())
+	println("#### register:", rtype.String())
 
 	c.Version(basicCtrl.Ver)
 	c.Init(basicCtrl.Jwt)
