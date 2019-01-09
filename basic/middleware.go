@@ -11,7 +11,6 @@ import (
 func Before(ctx iris.Context) {
 	remoteAddr := utils.GetRemoteAddr(ctx)
 	ctx.Values().Set("RemoteAddr", remoteAddr)
-	log.Println("before ########### 00000")
 	ctx.Next()
 }
 
